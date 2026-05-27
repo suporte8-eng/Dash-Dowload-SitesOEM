@@ -23,7 +23,7 @@
       "downloadImages": { "type": "boolean", "label": "Baixar imagens", "default": true }
     },
     "path": "scripts/_template.js"
-  }
+  },
   {
     "id": "GM",
     "name": "Download GM",
