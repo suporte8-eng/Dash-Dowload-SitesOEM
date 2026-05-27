@@ -35,6 +35,6 @@
       "delay": { "type": "number", "label": "Delay entre downloads (ms)", "default": 800 },
       "downloadImages": { "type": "boolean", "label": "Baixar imagens", "default": true }
     },
-    "path": "scripts/GM.js"
+    "path": "scripts/GM1.js"
   }
 ]
