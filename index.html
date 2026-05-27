@@ -549,7 +549,7 @@
   <div id="ext-banner" class="extension-banner">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
     <span>Extensão de Automação não detectada. <strong>Instale a extensão em modo developer</strong> para rodar as automações diretamente do painel.</span>
-    <a href="../README.md" target="_blank">Instruções de Instalação</a>
+    <a href="README.md" target="_blank">Instruções de Instalação</a>
   </div>
 
   <!-- Sidebar -->
@@ -570,7 +570,7 @@
     </div>
     
     <div class="sidebar-footer">
-      <a href="https://github.com" target="_blank" class="btn-add-script">Adicionar Novo Script</a>
+      <a href="https://github.com/suporte8-eng/Dash-Dowload-SitesOEM" target="_blank" class="btn-add-script">Adicionar Novo Script</a>
     </div>
   </aside>
 
@@ -760,8 +760,7 @@
     // Buscar lista de scripts do repositório/registro local de forma assíncrona
     async function loadScriptsRegistry() {
       try {
-        // Tenta buscar o arquivo de registro local/remoto
-        const response = await fetch("../scripts/registry.json");
+        const response = await fetch("scripts/registry.json");
         const list = await response.json();
         
         availableScripts = {};
@@ -772,7 +771,6 @@
         initScriptsList();
       } catch (err) {
         addLog("Erro ao carregar registry.json. Usando fallback local.", "error");
-        // Fallback caso acesse direto sem servidor web
         availableScripts = {
           "bmw": {
             id: "bmw",
@@ -986,9 +984,8 @@
       let scriptCodeText = "";
       
       try {
-        addLog(`Carregando código do script de: ${script.path || '../scripts/' + activeScriptId + '.js'}...`, "status");
-        // Busca o código do script correspondente de forma assíncrona
-        const scriptRes = await fetch(`../${script.path}`);
+        addLog(`Carregando código do script de: ${script.path || 'scripts/' + activeScriptId + '.js'}...`, "status");
+        const scriptRes = await fetch(script.path);
         scriptCodeText = await scriptRes.text();
       } catch (err) {
         addLog(`Erro ao carregar o código do script: ${err.message}.`, "error");
