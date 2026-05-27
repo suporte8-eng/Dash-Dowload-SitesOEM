@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>AutoDownload Dash - Painel de Controle</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --bg-base: #0a0b10;
+      --bg-panel: #11131e;
+      --bg-input: #1a1c2a;
+      --border-color: rgba(255, 255, 255, 0.08);
+      
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.15);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.15);
+      --warning: #f59e0b;
+      --warning-glow: rgba(245, 158, 11, 0.15);
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.15);
+      
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Extension Alert Banner */
+    .extension-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+      color: #fff;
+      padding: 12px 24px;
+      text-align: center;
+      font-weight: 500;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+      font-size: 0.95rem;
+      transform: translateY(-100%);
+      transition: var(--transition);
+    }
+
+    .extension-banner.visible {
+      transform: translateY(0);
+    }
+
+    .extension-banner a {
+      color: #fff;
+      text-decoration: underline;
+      font-weight: 700;
+    }
+
+    /* Sidebar Layout */
+    aside {
+      width: 320px;
+      background-color: var(--bg-panel);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #a78bfa 0%, #6366f1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .version {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .btn-settings {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-settings:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--primary);
+    }
+
+    .scripts-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .list-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      padding-left: 8px;
+    }
+
+    .script-item {
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid transparent;
+      border-radius: var(--radius-md);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .script-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.08);
+      transform: translateX(4px);
+    }
+
+    .script-item.active {
+      background: var(--primary-glow);
+      border-color: var(--primary);
+    }
+
+    .script-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .script-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge.active {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    .script-author {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn-add-script {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      text-decoration: none;
+      display: block;
+    }
+
+    .btn-add-script:hover {
+      background: var(--color-primary-hover);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Main Panel Layout */
+    main {
+      flex: 1;
+      height: 100%;
+      overflow-y: auto;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      margin-top: 0px;
+      transition: margin-top 0.3s ease;
+    }
+
+    body.banner-active main {
+      margin-top: 48px;
+    }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .panel-header {
+      margin-bottom: 32px;
+    }
+
+    .panel-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .panel-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .panel-desc {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.5;
+      max-width: 800px;
+    }
+
+    /* Two-column layout in main panel */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 30px;
+      flex: 1;
+    }
+
+    .grid-column {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Controls block */
+    .control-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .control-btn {
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: var(--transition);
+      color: #fff;
+    }
+
+    .control-btn:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      filter: grayscale(1);
+    }
+
+    .control-btn.start { background: var(--success); }
+    .control-btn.start:hover:not(:disabled) {
+      background: #0d9488;
+      box-shadow: 0 4px 12px var(--success-glow);
+    }
+
+    .control-btn.pause { background: var(--warning); }
+    .control-btn.pause:hover:not(:disabled) {
+      background: #d97706;
+      box-shadow: 0 4px 12px var(--warning-glow);
+    }
+
+    .control-btn.stop { background: var(--danger); }
+    .control-btn.stop:hover:not(:disabled) {
+      background: #dc2626;
+      box-shadow: 0 4px 12px var(--danger-glow);
+    }
+
+    /* Config Schema Form */
+    .config-form-group {
+      margin-bottom: 16px;
+    }
+
+    .config-form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .config-form-group input, .config-form-group select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .config-form-group input:focus, .config-form-group select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    /* Live Log Console */
+    .console-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .console-box {
+      height: 250px;
+      background: #06070a;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+
+    .console-entry {
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .console-entry.success { color: #34d399; }
+    .console-entry.error { color: #f87171; }
+    .console-entry.status { color: #60a5fa; }
+
+    /* History table */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    .history-table th {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .history-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .history-table tr:hover {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    /* Modal dialog */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 500px;
+      max-width: 90%;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      transform: translateY(-20px);
+      transition: var(--transition);
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Banner for missing extension -->
+  <div id="ext-banner" class="extension-banner">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span>Extensão de Automação não detectada. <strong>Instale a extensão em modo developer</strong> para rodar as automações diretamente do painel.</span>
+    <a href="../README.md" target="_blank">Instruções de Instalação</a>
+  </div>
+
+  <!-- Sidebar -->
+  <aside>
+    <div class="sidebar-header">
+      <div class="logo-container">
+        <span class="logo">AutoDownload Dash</span>
+        <span class="version">Painel Central</span>
+      </div>
+      <button class="btn-settings" id="btn-global-settings" title="Configurações Globais">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+    
+    <div class="scripts-list-container">
+      <div class="list-title">Automações Ativas</div>
+      <div id="scripts-list"></div>
+    </div>
+    
+    <div class="sidebar-footer">
+      <a href="https://github.com" target="_blank" class="btn-add-script">Adicionar Novo Script</a>
+    </div>
+  </aside>
+
+  <!-- Main Panel -->
+  <main id="main-content">
+    <div class="empty-state" id="empty-view">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg>
+      <h2>Selecione uma automação na barra lateral</h2>
+      <p style="margin-top: 8px;">Você poderá ajustar as configurações e acompanhar os downloads.</p>
+    </div>
+
+    <div id="details-view" style="display: none; height: 100%;">
+      <div class="panel-header">
+        <div class="panel-title-row">
+          <h2 class="panel-title" id="active-script-title">BMW TIS</h2>
+        </div>
+        <p class="panel-desc" id="active-script-desc">Carregando descrição...</p>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Coluna da Esquerda: Controles e Configuração -->
+        <div class="grid-column">
+          <div class="card">
+            <div class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Controles de Execução
+            </div>
+            
+            <div class="control-actions">
+              <button class="control-btn start" id="dash-btn-start">Iniciar</button>
+              <button class="control-btn pause" id="dash-btn-pause" disabled>Pausar</button>
+              <button class="control-btn stop" id="dash-btn-stop" disabled>Parar</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+              Configurações do Script
+            </div>
+            <div id="dash-config-fields">
+              <!-- Renderizados dinamicamente -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna da Direita: Logs e Histórico -->
+        <div class="grid-column">
+          <div class="card" style="flex: 1; display: flex; flex-direction: column;">
+            <div class="console-header">
+              <span class="card-title" style="margin-bottom: 0;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                Log de Progresso
+              </span>
+              <button class="btn-secondary" id="dash-btn-clear-log" style="padding: 4px 10px; font-size: 0.75rem;">Limpar</button>
+            </div>
+            <div class="console-box" id="dash-console-box" style="flex: 1;"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Últimas Execuções (Histórico)
+            </div>
+            <div style="max-height: 180px; overflow-y: auto;">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>Data/Hora</th>
+                    <th>Script</th>
+                    <th>Arquivos</th>
+                    <th>Sucesso</th>
+                    <th>Erros</th>
+                  </tr>
+                </thead>
+                <tbody id="history-rows">
+                  <tr>
+                    <td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum histórico registrado.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Global Settings Modal -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Configurações Globais</h3>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      
+      <div class="config-form-group">
+        <label for="global-delay">Delay Padrão entre downloads (ms)</label>
+        <input type="number" id="global-delay" value="1000">
+      </div>
+
+      <div class="config-form-group">
+        <label for="global-dest-url">Diretório de Destino (Informativo)</label>
+        <input type="text" id="global-dest-url" value="Downloads padrão do Navegador" readonly>
+        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+          Nota: Por segurança do sandbox, os navegadores controlam a pasta final de downloads.
+        </p>
+      </div>
+
+      <div style="margin-top: 20px; display: flex; gap: 10px;">
+        <button class="btn-secondary" id="btn-export-configs" style="flex: 1;">Exportar Configurações (JSON)</button>
+        <button class="btn-secondary" id="btn-import-configs" style="flex: 1;">Importar Configurações</button>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-add-script" id="btn-save-settings" style="width: auto; padding: 10px 24px;">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let availableScripts = {};
+    let activeScriptId = null;
+    let appState = "idle";
+    let isExtensionInstalled = false;
+
+    // Elementos da UI
+    const scriptsList = document.getElementById("scripts-list");
+    const emptyView = document.getElementById("empty-view");
+    const detailsView = document.getElementById("details-view");
+    const extBanner = document.getElementById("ext-banner");
+    
+    const activeTitle = document.getElementById("active-script-title");
+    const activeDesc = document.getElementById("active-script-desc");
+    const dashConfigFields = document.getElementById("dash-config-fields");
+    const dashConsoleBox = document.getElementById("dash-console-box");
+    const historyRows = document.getElementById("history-rows");
+
+    const dashBtnStart = document.getElementById("dash-btn-start");
+    const dashBtnPause = document.getElementById("dash-btn-pause");
+    const dashBtnStop = document.getElementById("dash-btn-stop");
+    const dashBtnClearLog = document.getElementById("dash-btn-clear-log");
+
+    const settingsModal = document.getElementById("settings-modal");
+    const btnGlobalSettings = document.getElementById("btn-global-settings");
+    const modalClose = document.getElementById("modal-close");
+    const btnSaveSettings = document.getElementById("btn-save-settings");
+
+    // Detectar extensão
+    function checkExtension() {
+      window.postMessage({ source: "autodownload-dash", type: "PING" }, "*");
+      
+      // Timeout para assumir que não está instalada
+      setTimeout(() => {
+        if (!isExtensionInstalled) {
+          extBanner.classList.add("visible");
+          document.body.classList.add("banner-active");
+        }
+      }, 1000);
+    }
+
+    // Escutar mensagens do content script (extensão)
+    window.addEventListener("message", (event) => {
+      if (event.data && event.data.source === "autodownload-extension") {
+        const { type } = event.data;
+
+        if (type === "EXTENSION_READY" || type === "PONG") {
+          isExtensionInstalled = true;
+          extBanner.classList.remove("visible");
+          document.body.classList.remove("banner-active");
+          addLog("Extensão conectada com sucesso!", "success");
+        }
+
+        if (type === "PROGRESS") {
+          addLog(`${event.data.current}/${event.data.total} — ${event.data.filename} ✓`, "success");
+          updateHistoryActive(event.data);
+        } else if (type === "STATUS") {
+          addLog(event.data.message, "status");
+        } else if (type === "ERROR") {
+          addLog(event.data.message, "error");
+        } else if (type === "STATE_CHANGE") {
+          updateStateUI(event.data.state);
+        }
+      }
+    });
+
+    // Buscar lista de scripts do repositório/registro local de forma assíncrona
+    async function loadScriptsRegistry() {
+      try {
+        // Tenta buscar o arquivo de registro local/remoto
+        const response = await fetch("../scripts/registry.json");
+        const list = await response.json();
+        
+        availableScripts = {};
+        list.forEach(item => {
+          availableScripts[item.id] = item;
+        });
+        
+        initScriptsList();
+      } catch (err) {
+        addLog("Erro ao carregar registry.json. Usando fallback local.", "error");
+        // Fallback caso acesse direto sem servidor web
+        availableScripts = {
+          "bmw": {
+            id: "bmw",
+            name: "BMW TIS",
+            version: "1.0",
+            author: "Comunidade",
+            matchUrls: ["*://tis.bmw.de/*", "*://*.bmw.de/*", "*://*.bmw.com/*"],
+            description: "Baixa documentos técnicos e diagramas do portal BMW TIS e GM",
+            configSchema: {
+              delay: { type: "number", label: "Delay entre downloads (ms)", default: 800 }
+            },
+            path: "scripts/bmw.js"
+          }
+        };
+        initScriptsList();
+      }
+    }
+
+    // Inicialização da lista de scripts
+    function initScriptsList() {
+      scriptsList.innerHTML = "";
+      for (const id in availableScripts) {
+        const script = availableScripts[id];
+        const item = document.createElement("div");
+        item.className = "script-item";
+        item.dataset.id = id;
+        item.innerHTML = `
+          <div class="script-meta">
+            <span class="script-name">${script.name}</span>
+            <span class="badge active">Ativo</span>
+          </div>
+          <div class="script-author">Por ${script.author} (v${script.version})</div>
+        `;
+        item.addEventListener("click", () => selectScript(id));
+        scriptsList.appendChild(item);
+      }
+    }
+
+    function selectScript(id) {
+      activeScriptId = id;
+      document.querySelectorAll(".script-item").forEach(item => {
+        item.classList.toggle("active", item.dataset.id === id);
+      });
+
+      emptyView.style.display = "none";
+      detailsView.style.display = "block";
+
+      const script = availableScripts[id];
+      activeTitle.textContent = script.name;
+      activeDesc.textContent = script.description;
+
+      renderConfigSchema(script);
+    }
+
+    function renderConfigSchema(script) {
+      dashConfigFields.innerHTML = "";
+      const schema = script.configSchema || {};
+      const savedConfig = JSON.parse(localStorage.getItem(`config_${script.id}`)) || {};
+
+      for (const key in schema) {
+        const field = schema[key];
+        const group = document.createElement("div");
+        group.className = "config-form-group";
+
+        const label = document.createElement("label");
+        label.textContent = field.label || key;
+
+        let input;
+        if (field.type === "number") {
+          input = document.createElement("input");
+          input.type = "number";
+          input.value = savedConfig[key] !== undefined ? savedConfig[key] : (field.default || 0);
+        } else if (field.type === "boolean") {
+          input = document.createElement("select");
+          input.innerHTML = `<option value="true">Sim</option><option value="false">Não</option>`;
+          input.value = savedConfig[key] !== undefined ? String(savedConfig[key]) : String(field.default);
+        } else {
+          input = document.createElement("input");
+          input.type = "text";
+          input.value = savedConfig[key] !== undefined ? savedConfig[key] : (field.default || "");
+        }
+
+        input.dataset.key = key;
+        input.dataset.type = field.type;
+        input.className = "dash-config-input";
+
+        input.addEventListener("change", () => {
+          const config = getConfigsFromForm();
+          localStorage.setItem(`config_${script.id}`, JSON.stringify(config));
+        });
+
+        group.appendChild(label);
+        group.appendChild(input);
+        dashConfigFields.appendChild(group);
+      }
+    }
+
+    function getConfigsFromForm() {
+      const inputs = dashConfigFields.querySelectorAll(".dash-config-input");
+      const config = {};
+      inputs.forEach(input => {
+        const key = input.dataset.key;
+        const type = input.dataset.type;
+        let val = input.value;
+        if (type === "number") val = Number(val);
+        if (type === "boolean") val = val === "true";
+        config[key] = val;
+      });
+      return config;
+    }
+
+    function updateStateUI(state) {
+      appState = state;
+      if (state === "running") {
+        dashBtnStart.disabled = true;
+        dashBtnPause.disabled = false;
+        dashBtnPause.textContent = "Pausar";
+        dashBtnStop.disabled = false;
+      } else if (state === "paused") {
+        dashBtnStart.disabled = false;
+        dashBtnStart.textContent = "Retomar";
+        dashBtnPause.disabled = true;
+        dashBtnStop.disabled = false;
+      } else { // idle
+        dashBtnStart.disabled = false;
+        dashBtnStart.textContent = "Iniciar";
+        dashBtnPause.disabled = true;
+        dashBtnPause.textContent = "Pausar";
+        dashBtnStop.disabled = true;
+      }
+    }
+
+    // Logger
+    function addLog(message, type = "status") {
+      const entry = document.createElement("div");
+      entry.className = `console-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      dashConsoleBox.appendChild(entry);
+      dashConsoleBox.scrollTop = dashConsoleBox.scrollHeight;
+    }
+
+    // Histórico
+    function saveHistory(scriptId, total, success, errors) {
+      let history = JSON.parse(localStorage.getItem("execution_history")) || [];
+      const newEntry = {
+        date: new Date().toLocaleString(),
+        script: availableScripts[scriptId].name,
+        total,
+        success,
+        errors
+      };
+      history.unshift(newEntry);
+      if (history.length > 50) history.pop();
+      localStorage.setItem("execution_history", JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const history = JSON.parse(localStorage.getItem("execution_history")) || [];
+      if (history.length === 0) {
+        historyRows.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum histórico registrado.</td></tr>`;
+        return;
+      }
+
+      historyRows.innerHTML = history.map(h => `
+        <tr>
+          <td>${h.date}</td>
+          <td style="font-weight: 600;">${h.script}</td>
+          <td>${h.total}</td>
+          <td style="color: var(--success); font-weight: 500;">${h.success}</td>
+          <td style="${h.errors > 0 ? 'color: var(--danger); font-weight: 500;' : ''}">${h.errors}</td>
+        </tr>
+      `).join("");
+    }
+
+    let activeExecution = null;
+    function updateHistoryActive(progressData) {
+      if (!activeExecution) {
+        activeExecution = {
+          scriptId: activeScriptId,
+          total: progressData.total,
+          success: 0,
+          errors: 0
+        };
+      }
+      
+      activeExecution.success = progressData.current;
+      activeExecution.total = progressData.total;
+
+      if (progressData.current === progressData.total) {
+        saveHistory(activeExecution.scriptId, activeExecution.total, activeExecution.success, activeExecution.errors);
+        activeExecution = null;
+      }
+    }
+
+    // Eventos Controles
+    dashBtnStart.addEventListener("click", async () => {
+      if (!isExtensionInstalled) {
+        alert("Por favor, instale a extensão do Chrome para rodar automações diretamente do painel.");
+        return;
+      }
+
+      if (appState === "paused") {
+        window.postMessage({ source: "autodownload-dash", type: "RESUME_SCRIPT" }, "*");
+        updateStateUI("running");
+        addLog("Execução retomada.", "status");
+        return;
+      }
+
+      const script = availableScripts[activeScriptId];
+      let scriptCodeText = "";
+      
+      try {
+        addLog(`Carregando código do script de: ${script.path || '../scripts/' + activeScriptId + '.js'}...`, "status");
+        // Busca o código do script correspondente de forma assíncrona
+        const scriptRes = await fetch(`../${script.path}`);
+        scriptCodeText = await scriptRes.text();
+      } catch (err) {
+        addLog(`Erro ao carregar o código do script: ${err.message}.`, "error");
+        return;
+      }
+
+      const config = getConfigsFromForm();
+      
+      window.postMessage({
+        source: "autodownload-dash",
+        type: "RUN_SCRIPT",
+        scriptId: activeScriptId,
+        config: config,
+        scriptCode: scriptCodeText
+      }, "*");
+
+      updateStateUI("running");
+      addLog(`Iniciando execução de ${script.name}...`, "status");
+    });
+
+    dashBtnPause.addEventListener("click", () => {
+      window.postMessage({ source: "autodownload-dash", type: "PAUSE_SCRIPT" }, "*");
+      updateStateUI("paused");
+      addLog("Solicitando pausa...", "status");
+    });
+
+    dashBtnStop.addEventListener("click", () => {
+      window.postMessage({ source: "autodownload-dash", type: "STOP_SCRIPT" }, "*");
+      updateStateUI("idle");
+      addLog("Execução parada.", "error");
+      if (activeExecution) {
+        saveHistory(activeExecution.scriptId, activeExecution.total, activeExecution.success, activeExecution.errors + 1);
+        activeExecution = null;
+      }
+    });
+
+    dashBtnClearLog.addEventListener("click", () => {
+      dashConsoleBox.innerHTML = "";
+    });
+
+    // Eventos do Modal de Configurações
+    btnGlobalSettings.addEventListener("click", () => {
+      settingsModal.classList.add("open");
+    });
+
+    modalClose.addEventListener("click", () => {
+      settingsModal.classList.remove("open");
+    });
+
+    btnSaveSettings.addEventListener("click", () => {
+      const delay = document.getElementById("global-delay").value;
+      localStorage.setItem("global_delay", delay);
+      settingsModal.classList.remove("open");
+      addLog("Configurações globais salvas.", "status");
+    });
+
+    document.getElementById("btn-export-configs").addEventListener("click", () => {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        data[key] = localStorage.getItem(key);
+      }
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "autodownload-dash-configs.json";
+      a.click();
+    });
+
+    document.getElementById("btn-import-configs").addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".json";
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          try {
+            const data = JSON.parse(evt.target.result);
+            for (const key in data) {
+              localStorage.setItem(key, data[key]);
+            }
+            alert("Configurações importadas com sucesso! Recarregando painel...");
+            window.location.reload();
+          } catch (err) {
+            alert("Erro ao importar configurações. Arquivo inválido.");
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    });
+
+    // Iniciar tudo
+    loadScriptsRegistry();
+    renderHistory();
+    checkExtension();
+  </script>
+</body>
+</html>

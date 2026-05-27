@@ -1,0 +1,27 @@
+[
+  {
+    "id": "bmw",
+    "name": "BMW TIS",
+    "version": "1.0",
+    "author": "Comunidade",
+    "matchUrls": ["*://tis.bmw.de/*", "*://*.bmw.de/*", "*://*.bmw.com/*", "*://tisv2.bmw.com/*"],
+    "description": "Baixa documentos técnicos e diagramas do portal BMW TIS e GM",
+    "configSchema": {
+      "delay": { "type": "number", "label": "Delay entre downloads (ms)", "default": 800 }
+    },
+    "path": "scripts/bmw.js"
+  },
+  {
+    "id": "template",
+    "name": "Script Template",
+    "version": "1.0",
+    "author": "Seu Nome",
+    "matchUrls": ["*://exemplo.com/*"],
+    "description": "Template base para criação de novas automações de download.",
+    "configSchema": {
+      "delay": { "type": "number", "label": "Delay entre downloads (ms)", "default": 1000 },
+      "downloadImages": { "type": "boolean", "label": "Baixar imagens", "default": true }
+    },
+    "path": "scripts/_template.js"
+  }
+]
