@@ -24,4 +24,17 @@
     },
     "path": "scripts/_template.js"
   }
+  {
+    "id": "GM",
+    "name": "Download GM",
+    "version": "1.0",
+    "author": "Schiavo",
+    "matchUrls": ["*://gsitlc.ext.gm.com/*"],
+    "description": "Baixa documentos da GM.",
+    "configSchema": {
+      "delay": { "type": "number", "label": "Delay entre downloads (ms)", "default": 800 },
+      "downloadImages": { "type": "boolean", "label": "Baixar imagens", "default": true }
+    },
+    "path": "scripts/GM.js"
+  }
 ]
